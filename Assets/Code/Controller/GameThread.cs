@@ -224,8 +224,10 @@ public class GameThread : MonoBehaviour
             if (selectedChess.ChessType != ChessType.PAO && 
                 chessObject.ColorType != bound && chessObject.IsUp)
             {
-                //如果点击的棋子比被选中的棋子小，才能吃棋
-                if (selectedChess.ChessType >= chessObject.ChessType)
+                //如果点击的棋子比被选中的棋子小，才能吃棋（帅不能吃兵，兵可以吃帅）
+                if ((selectedChess.ChessType >= chessObject.ChessType && 
+                    !(selectedChess.ChessType == ChessType.SHUAI && chessObject.ChessType == ChessType.BING)) || 
+                    (selectedChess.ChessType == ChessType.BING && chessObject.ChessType == ChessType.SHUAI))
                 {
                     //把被吃棋子的生存状态标记为死亡
                     chessObject.IsLive = false;

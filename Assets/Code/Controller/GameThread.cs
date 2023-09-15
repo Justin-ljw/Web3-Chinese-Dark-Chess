@@ -19,6 +19,11 @@ public class GameThread : MonoBehaviour
     private static float boundTime = 60f;
     //本回合开始的时间
     private float boundStartTime = 0f;
+    
+    //音乐播放组件
+    private AudioSource audioSource;
+    //储存音乐资源的脚本
+    private MusicClass musicClass;
 
     // Start is called before the first frame update
     void Start()
@@ -37,7 +42,9 @@ public class GameThread : MonoBehaviour
 
     public void GameLoad()
     {
-
+        //获取音乐播放组件和音乐资源文件
+        audioSource = GetComponent<AudioSource>();
+        musicClass = GetComponent<MusicClass>();
     }
 
     //游戏进行时
@@ -203,6 +210,9 @@ public class GameThread : MonoBehaviour
             //选择当前点击的棋子
             chessObject.Select();
 
+            //播放选棋音效
+            audioSource.PlayOneShot(musicClass.selectChess);
+
             //如果本来有棋子已经被选中，就取消选中原本的棋子
             if(selectedChess != null)
             {
@@ -229,9 +239,6 @@ public class GameThread : MonoBehaviour
                     !(selectedChess.ChessType == ChessType.SHUAI && chessObject.ChessType == ChessType.BING)) || 
                     (selectedChess.ChessType == ChessType.BING && chessObject.ChessType == ChessType.SHUAI))
                 {
-                    //把被吃棋子的生存状态标记为死亡
-                    chessObject.IsLive = false;
-
                     //获取被吃棋子所在的棋盘格子对象
                     GameObject board = boardClass.BoardManager[chessObject.X, chessObject.Y];
 
@@ -239,6 +246,9 @@ public class GameThread : MonoBehaviour
                     //两棋子碰撞时，执行棋子被吃的操作
                     if(selectedChess.Move(board))
                     {
+                        //把被吃棋子的生存状态标记为死亡
+                        chessObject.IsLive = false;
+
                         //如果可以移动，切换回合
                         BoundChange();
                     }
@@ -251,9 +261,6 @@ public class GameThread : MonoBehaviour
                 //如果炮能吃到点击的棋子
                 if(selectedChess.IsPaoCanEat(chessObject))
                 {
-                    //把被吃棋子的生存状态标记为死亡
-                    chessObject.IsLive = false;
-
                     //获取被吃棋子所在的棋盘格子对象
                     GameObject board = boardClass.BoardManager[chessObject.X, chessObject.Y];
 
@@ -261,6 +268,9 @@ public class GameThread : MonoBehaviour
                     //两棋子碰撞时，执行棋子被吃的操作
                     if (selectedChess.Move(board))
                     {
+                        //把被吃棋子的生存状态标记为死亡
+                        chessObject.IsLive = false;
+
                         //如果可以移动，切换回合
                         BoundChange();
                     }
@@ -278,6 +288,9 @@ public class GameThread : MonoBehaviour
         {
             if (selectedChess.Move(boardElement))
             {
+                //播放走棋音效
+                audioSource.PlayOneShot(musicClass.upAndMoveChess);
+
                 //如果可以移动，切换回合
                 BoundChange();
             }

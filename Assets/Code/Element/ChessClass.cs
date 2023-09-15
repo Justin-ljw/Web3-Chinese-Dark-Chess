@@ -18,8 +18,8 @@ public class ChessClass : MonoBehaviour
     private Vector3 target = Vector3.zero;//棋子要移动到的目的坐标（如果不为zero则本棋子正在移动，否则为不在移动）
     private BoardClass boardClass;//棋盘管理器
     private Animator animator;//动画器组件
-    private AnimatorStateInfo animatorStateInfo;//正在播放的动画
-    private bool isAnimating;//本棋子是否有动画正在进行
+    private AudioSource audioSource;//音乐播放组件
+    private MusicClass musicClass;//储存音乐资源的脚本
 
     private void Start()
     {
@@ -89,20 +89,19 @@ public class ChessClass : MonoBehaviour
         //获取本棋子在棋盘上的索引
         boardClass.GetChessIndex(gameObject, out x, out y);
 
-        //获取动画器组件（在父物体上）
+        //获取物体的动画组件
+        //（操作的是棋子物体最外层的父物体，动画组件在父物体中）
         animator = transform.parent.GetComponent<Animator>();
-        //获取正在播放的动画
-        animatorStateInfo = animator.GetCurrentAnimatorStateInfo(0);
+
+        //获取音乐播放组件和音乐资源文件
+        audioSource = GameObject.Find("ChessBoard").GetComponent<AudioSource>();
+        musicClass = GameObject.Find("ChessBoard").GetComponent<MusicClass>();
     }
 
     public void Select()
     {
         if(!IsSelected)
         {
-            //获取物体的动画组件
-            //（操作的是棋子物体最外层的父物体，动画组件在父物体中）
-            Animator animator = transform.parent.GetComponent<Animator>(); 
-
             //把他标记为选中，并把其他的棋子都标记为未选中
             IsSelected = true;
 
@@ -118,10 +117,6 @@ public class ChessClass : MonoBehaviour
     {
         if(IsSelected)
         {
-            //获取物体的动画组件
-            //（操作的是棋子物体最外层的父物体，动画组件在父物体中）
-             Animator animator = transform.parent.GetComponent<Animator>();
-
             //标记为未选中
             IsSelected = false;
 
@@ -165,16 +160,23 @@ public class ChessClass : MonoBehaviour
     //翻起棋子
     public void Up()
     {
-        //获取物体的动画组件
-        //（操作的是棋子物体最外层的父物体，动画组件在父物体中）
-        Animator animator = transform.parent.GetComponent<Animator>();
-
         //设置棋子翻起状态，取消选中状态
         IsUp = true;
         IsSelected = false;
 
         //取消显示高光
         RemoveHighLight();
+
+        //播放翻棋音效
+        if(chessType == ChessType.SHUAI)
+        {
+            audioSource.PlayOneShot(musicClass.upShuai);
+        }
+        else
+        {
+            audioSource.PlayOneShot(musicClass.upAndMoveChess);
+        }
+        
         //翻起动画:启动翻起动作，翻起完成后取消选中状态，并取消选中动作
         animator.SetTrigger("isUp");
         animator.SetBool("isSelected", false);
@@ -358,6 +360,18 @@ public class ChessClass : MonoBehaviour
             else
             {
                 PlayerClass.GetEnemy().Hp -= boardClass.GetChessHp(ChessType);
+            }
+
+            //播放吃棋音效
+            if (chessType == ChessType.SHUAI)
+            {
+                //播放吃帅音效
+                audioSource.PlayOneShot(musicClass.eatShuai);
+            }
+            else
+            {
+                //播放吃棋音效
+                audioSource.PlayOneShot(musicClass.eatChess);
             }
 
             //获取棋子的最外层父物体

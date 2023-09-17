@@ -1,15 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class GameThread : MonoBehaviour
 {
     //被选中的棋子（没有棋子被选中时为null）
     private ChessClass selectedChess = null;
     //玩家对象
-    private PlayerClass player = PlayerClass.GetPlayer();
+    private PlayerClass player1 = PlayerClass.GetPlayer();
     //敌人对象
-    private PlayerClass enemy = PlayerClass.GetEnemy();
+    private PlayerClass player2 = PlayerClass.GetEnemy();
     //棋盘管理器
     private BoardClass boardClass;
 
@@ -19,6 +22,12 @@ public class GameThread : MonoBehaviour
     private static float boundTime = 60f;
     //本回合开始的时间
     private float boundStartTime = 0f;
+    //UI计时器
+    public Text txtTimer;
+    private int timer = 60;
+
+    public TMP_Text HP1;
+    public TMP_Text HP2;
 
     // Start is called before the first frame update
     void Start()
@@ -46,6 +55,7 @@ public class GameThread : MonoBehaviour
         //判定是否超时，没有超时游戏才能继续
         if (!IsOutOfBound())
         {
+            
             //如果没有棋子在移动时，才能进行其他操作
             if (!MovingChess())
             {
@@ -62,17 +72,19 @@ public class GameThread : MonoBehaviour
     //判定是否超时，超时则直接判定输了（true为超时，false为没有超时）
     private bool IsOutOfBound()
     {
+        timer = (int)(60 - Time.time + boundStartTime);
+        txtTimer.text = Convert.ToString(timer);
         //如果游戏当前的时间距离本回合开始的时间超过一个回合的时间则自动判定这一方输了
-        if(Time.time - boundStartTime >= boundTime)
+        if (timer <= 0)
         {
             //设置当前回合的一方输了
-            if(bound == player.ChessColor)
+            if(bound == player1.ChessColor)
             {
-                player.Hp = 0;
+                player1.Hp = 0;
             }
             else
             {
-                enemy.Hp = 0;
+                player2.Hp = 0;
             }
 
             return true;
@@ -85,18 +97,18 @@ public class GameThread : MonoBehaviour
     private void EndGame()
     {
         //如果有一方血量小于或等于0，则游戏结束，并显示输赢
-        if(player.Hp <= 0)
+        if(player1.Hp <= 0)
         {
             ///显示输赢
-            Debug.Log("Enemy Win");
+            Debug.Log("player2 Win");
 
             //暂停游戏
             Time.timeScale = 0;
         }
-        else if(enemy.Hp <= 0)
+        else if(player2.Hp <= 0)
         {
             ///显示输赢
-            Debug.Log("Player Win");
+            Debug.Log("player1 Win");
 
             //暂停游戏
             Time.timeScale = 0;

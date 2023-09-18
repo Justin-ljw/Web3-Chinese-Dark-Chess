@@ -7,7 +7,7 @@ Mesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Xiang
-  serializedVersion: 10
+  serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -174,6 +174,7 @@ Mesh:
     m_Center: {x: 0.066594996, y: 0.013736198, z: 0.044600144}
     m_Extent: {x: 0.21560317, y: 0.07306122, z: 0.21560328}
   m_MeshUsageFlags: 0
+  m_CookingOptions: 30
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 453285.7

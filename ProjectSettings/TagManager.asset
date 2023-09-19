@@ -8,6 +8,7 @@ TagManager:
   - RedChess
   - BlackChess
   - BoardElement
+  - record1
   layers:
   - Default
   - TransparentFX

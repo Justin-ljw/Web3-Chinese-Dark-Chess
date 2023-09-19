@@ -177,7 +177,7 @@ public class BoardClass
            "Black.Bing.3","Black.Bing.4","Black.Bing.5"
         };
     
-        Random random = new System.Random();
+        Random random = new System.Random((int)System.DateTime.Now.Ticks);
 
         //获取预制件
         GameObject chessPrefab = Resources.Load("Prefab/Chess") as GameObject;
@@ -195,7 +195,7 @@ public class BoardClass
                 GameObject chess = GameObject.Instantiate(chessPrefab, boardManager[i, j].transform.position, Quaternion.identity);
                 chess.transform.GetChild(0).transform.GetChild(0).name = chessName[index];
 
-                //启动脚本，并根据上一行的名字进行自动配置棋子
+                //启动脚本，并根据名字进行自动配置棋子
                 chess.transform.GetChild(0).transform.GetChild(0).GetComponent<ChessClass>().enabled = true;
 
                 chessManager[i, j] = chess.transform.Find("Chess/"+chessName[index]).gameObject;

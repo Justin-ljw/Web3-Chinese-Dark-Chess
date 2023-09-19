@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class GameThread : MonoBehaviour
 {
@@ -12,13 +15,44 @@ public class GameThread : MonoBehaviour
     private PlayerClass enemy = PlayerClass.GetEnemy();
     //棋盘管理器
     private BoardClass boardClass;
+    //UI画布
+    public Canvas canvas;
 
     //当前回合的棋子颜色（红色为true，黑色为false，红方先行）
     private bool bound = true;
     //一回合的时间
-    private static float boundTime = 60f;
+    //private static float boundTime = 60f;
     //本回合开始的时间
     private float boundStartTime = 0f;
+
+    //UI计时器
+    public TMP_Text txtTimer_red;
+    public TMP_Text txtTimer_blue;
+    private TMP_Text txtTimer;
+    private int timer = 60;
+
+    //UI玩家血量
+    public TMP_Text HPnum1;
+    public TMP_Text HPnum2;
+    public Slider HPUI1;
+    public Slider HPUI2;
+
+    //UI伤害显示
+    public TMP_Text hurtnum_red;
+    public TMP_Text hurtnum_blue;
+
+    //UI播报
+    public Image broadcast;
+
+    //UI头像框火焰
+    public Image left_fire;
+    public Image right_fire;
+
+    //UI棋子剩余
+    private Dictionary<string, int> record = new Dictionary<string, int>() {
+        {"Black_SHUAI",1 },{"Black_SHI",2},{"Black_XIANG",2},{"Black_JU",2},{"Black_MA",2},{"Black_PAO",2},{"Black_BING",5},
+        {"Red_SHUAI",1 },{"Red_SHI",2},{"Red_XIANG",2},{"Red_JU",2},{"Red_MA",2},{"Red_PAO",2},{"Red_BING",5}
+    };
 
     // Start is called before the first frame update
     void Start()
@@ -37,7 +71,31 @@ public class GameThread : MonoBehaviour
 
     public void GameLoad()
     {
+        //随机决定先行方
+        System.Random random = new System.Random((int)System.DateTime.Now.Ticks);
+        int n = random.Next(100);
 
+        Image bc = Instantiate(broadcast, broadcast.transform.parent);
+
+        if (n % 2 == 0)
+        {
+            bound = true;
+            txtTimer = txtTimer_red;
+            bc.GetComponent<Image>().sprite = Resources.Load<Sprite>("Img/red_first");
+            right_fire.enabled = true;
+        }
+        else
+        {
+            bound = false;
+            txtTimer = txtTimer_blue;
+            bc.GetComponent<Image>().sprite = Resources.Load<Sprite>("Img/blue_first");
+            left_fire.enabled = true;
+
+        }
+
+        txtTimer.enabled = true;
+        bc.enabled = true;
+        Destroy(bc, 2);
     }
 
     //游戏进行时
@@ -46,11 +104,14 @@ public class GameThread : MonoBehaviour
         //判定是否超时，没有超时游戏才能继续
         if (!IsOutOfBound())
         {
+            
             //如果没有棋子在移动时，才能进行其他操作
             if (!MovingChess())
             {
                 ChessControl();
+                UIchange();
             }
+
         }
 
         //判定是否结束游戏
@@ -62,8 +123,10 @@ public class GameThread : MonoBehaviour
     //判定是否超时，超时则直接判定输了（true为超时，false为没有超时）
     private bool IsOutOfBound()
     {
+        timer = (int)(60 - Time.time + boundStartTime);
+        txtTimer.text = Convert.ToString(timer);
         //如果游戏当前的时间距离本回合开始的时间超过一个回合的时间则自动判定这一方输了
-        if(Time.time - boundStartTime >= boundTime)
+        if (timer <= 0)
         {
             //设置当前回合的一方输了
             if(bound == player.ChessColor)
@@ -88,7 +151,7 @@ public class GameThread : MonoBehaviour
         if(player.Hp <= 0)
         {
             ///显示输赢
-            Debug.Log("Enemy Win");
+            Debug.Log("enemy Win");
 
             //暂停游戏
             Time.timeScale = 0;
@@ -96,7 +159,7 @@ public class GameThread : MonoBehaviour
         else if(enemy.Hp <= 0)
         {
             ///显示输赢
-            Debug.Log("Player Win");
+            Debug.Log("player Win");
 
             //暂停游戏
             Time.timeScale = 0;
@@ -106,11 +169,29 @@ public class GameThread : MonoBehaviour
     //回合切换
     private void BoundChange()
     {
+        left_fire.enabled = false;
+        right_fire.enabled = false;
+
+        txtTimer.enabled = false;
         //当前的回合方切换颜色
         bound = !bound;
         //Debug.Log("当前为："+bound);
         //当前的时间设置为新回合的开始时间
         boundStartTime = Time.time;
+
+        //切换计时器
+        if (bound)
+        {
+            txtTimer = txtTimer_red;
+            right_fire.enabled = true;
+        }
+        else
+        {
+            txtTimer = txtTimer_blue;
+            left_fire.enabled = true;
+        }
+        Debug.Log(txtTimer);
+        txtTimer.enabled = true;
     }
 
     //监听鼠标点击
@@ -152,6 +233,8 @@ public class GameThread : MonoBehaviour
                     {
                         //吃棋
                         EatChess(chessObject);
+
+                      
                     }
                 }
                 //点击的物体是棋盘格子
@@ -172,6 +255,8 @@ public class GameThread : MonoBehaviour
 
                         //吃棋
                         EatChess(hitChessClass);
+
+                    
                     }
                 }
             }
@@ -241,7 +326,10 @@ public class GameThread : MonoBehaviour
                     {
                         //如果可以移动，切换回合
                         BoundChange();
+                        
                     }
+
+                    Recordchange(chessObject);
                 }
             }
             //选中的已翻起的棋子为炮时，点击的棋子不是已翻起的当前方的棋子，都执行吃棋
@@ -263,12 +351,68 @@ public class GameThread : MonoBehaviour
                     {
                         //如果可以移动，切换回合
                         BoundChange();
+                        
                     }
+                    Recordchange(chessObject);
                 }
             }
         }
     }
+    private void UIchange()
+    {
+        ////UI血量调节
+        HPnum2.text = Convert.ToString(PlayerClass.GetPlayer().Hp);
+        HPUI2.value = PlayerClass.GetPlayer().Hp;
 
+        HPnum1.text = Convert.ToString(PlayerClass.GetEnemy().Hp);
+        HPUI1.value = PlayerClass.GetEnemy().Hp;
+    }
+    private void Recordchange(ChessClass chessObject)
+    {
+        String name = "";
+        String i = "";
+        Color color;
+        if (chessObject.ColorType)
+        {
+            name += "Red_";
+            i += "2";
+            color = Color.red;
+        }
+        else
+        {
+            name += "Black_";
+            i += "1";
+            color = Color.blue;
+        }
+        name += chessObject.ChessType;
+        GameObject chessnum = GameObject.Find("record" + i + "/" + name);
+        chessnum.GetComponentInChildren<TextMeshProUGUI>().text = "x"+Convert.ToString(record[name]-=1);
+
+        //伤害飘字
+        TMP_Text hurtnum;
+        if (bound)
+        {
+            hurtnum = Instantiate(hurtnum_red,hurtnum_red.transform.parent);
+        }
+        else
+        {
+            hurtnum = Instantiate(hurtnum_blue, hurtnum_blue.transform.parent);
+        }
+        hurtnum.text = "-" + Convert.ToString(boardClass.GetChessHp(chessObject.ChessType));
+        hurtnum.enabled = true;
+        Destroy(hurtnum, 2);
+
+
+        if (chessObject.ChessType == ChessType.SHUAI)
+        {
+            Image bc = Instantiate(broadcast, broadcast.transform.parent);
+            bc.sprite = Resources.Load<Sprite>("Img/KillShuai");
+            bc.enabled = true;
+            Destroy(bc, 2);
+        }
+
+
+    }
     //走棋（传入要移动到的棋盘格子对象）
     private void MoveChess(GameObject boardElement)
     {

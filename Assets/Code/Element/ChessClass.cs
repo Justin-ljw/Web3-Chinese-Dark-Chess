@@ -352,8 +352,11 @@ public class ChessClass : MonoBehaviour
             //（棋子管理器中本棋子所在的索引已在吃棋棋子Move()时，替换为吃棋棋子）
             boardClass.AddDeadChess(gameObject);
 
+            ////获取预制件
+            //GameObject hurtPrefab = Resources.Load("Prefab/hurt") as GameObject;
+
             //判断本棋子的颜色所属，并扣除对应一方玩家本棋子对应的血量
-            if(colorType == PlayerClass.GetPlayer().ChessColor)
+            if (colorType == PlayerClass.GetPlayer().ChessColor)
             {
                 PlayerClass.GetPlayer().Hp -= boardClass.GetChessHp(ChessType);
             }

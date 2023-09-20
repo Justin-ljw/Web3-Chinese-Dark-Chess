@@ -4,5 +4,32 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/SampleScene.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/UIscenes/gamemenu.unity
+    guid: 9f21f7c77a435884f88a2024948cf63a
+  - enabled: 1
+    path: Assets/UIscenes/load.unity
+    guid: 562902d30ddc06542be68ffd9ac22007
+  - enabled: 1
+    path: Assets/UIscenes/package.unity
+    guid: 7614a98df8f95fe46a7ba0ea7c161cd3
+  - enabled: 1
+    path: Assets/UIscenes/register.unity
+    guid: 42ac58bc54bdfa64a9d6a94d90c913b3
+  - enabled: 1
+    path: Assets/UIscenes/rule.unity
+    guid: d5b3818106c32ae468039afc1c69881e
+  - enabled: 1
+    path: Assets/UIscenes/start.unity
+    guid: b118db6d0995ee94ebf3f73ac20d6387
+  - enabled: 1
+    path: Assets/UIscenes/winend.unity
+    guid: 9d4d05a5d77e0874e86e8022b1adb427
+  - enabled: 1
+    path: Assets/UIscenes/loseend.unity
+    guid: 3a9a45f6e26dc07489ac19e67f7d5b31
   m_configObjects: {}

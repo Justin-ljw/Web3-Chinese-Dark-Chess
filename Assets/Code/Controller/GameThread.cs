@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameThread : MonoBehaviour
 {
@@ -164,6 +165,9 @@ public class GameThread : MonoBehaviour
 
             //‘›Õ£”Œœ∑
             Time.timeScale = 0;
+
+            GameObject.Find("GameData").GetComponent<GameData>().param = 12313213;
+            SceneManager.LoadScene(8);
         }
         else if(enemy.Hp <= 0)
         {
@@ -172,6 +176,9 @@ public class GameThread : MonoBehaviour
 
             //‘›Õ£”Œœ∑
             Time.timeScale = 0;
+
+            GameObject.Find("GameData").GetComponent<GameData>().param = 12313213;
+            SceneManager.LoadScene(7);
         }
     }
 

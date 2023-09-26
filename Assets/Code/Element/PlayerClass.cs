@@ -6,7 +6,7 @@ public class PlayerClass
 {
     private bool isMe;//是否为我方（true为我方，false为敌方）
     private bool chessColor;//棋子颜色（true为红色，false为黑色，红方先行）
-    private int hp = 60;//血量
+    private int hp;//血量
     private string playerName = "";//玩家名称
 
     public bool IsMe { get => isMe; set => isMe = value; }
@@ -59,13 +59,15 @@ public class PlayerClass
     }
 
     //不允许new，只能通过get获得唯一的玩家对象和唯一的敌人对象
-    private PlayerClass()
-    {
-        Init();
-    }
+    private PlayerClass(){}
 
-    private void Init()
+    //初始化方法
+    //由于使用双例类，必须使用静态变量，
+    //第二次重新进入当前场景时，本类的内存不会清除，但类里面的变量会，所以要重新初始化一下
+    //所以构造函数和初始化函数分开调用，每次进入下棋场景都初始化一下本类
+    public void Init()
     {
-        
+        //初始化血量
+        hp = 60;
     }
 }

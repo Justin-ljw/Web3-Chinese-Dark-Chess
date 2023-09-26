@@ -9,22 +9,24 @@ using UnityEngine.SceneManagement;
 public class GameThread : MonoBehaviour
 {
     //被选中的棋子（没有棋子被选中时为null）
-    private ChessClass selectedChess = null;
+    private ChessClass selectedChess;
     //玩家对象
-    private PlayerClass player = PlayerClass.GetPlayer();
+    private PlayerClass player;
     //敌人对象
-    private PlayerClass enemy = PlayerClass.GetEnemy();
+    private PlayerClass enemy;
     //棋盘管理器
     private BoardClass boardClass;
+    //加载器
+    private ChessLoader chessLoader;
     //UI画布
     public Canvas canvas;
 
     //当前回合的棋子颜色（红色为true，黑色为false，红方先行）
-    private bool bound = true;
+    private bool bound;
     //一回合的时间
-    //private static float boundTime = 60f;
+    private static float boundTime = 45f;
     //本回合开始的时间
-    private float boundStartTime = 0f;
+    private float boundStartTime;
     
     //音乐播放组件
     private AudioSource audioSource;
@@ -35,7 +37,7 @@ public class GameThread : MonoBehaviour
     public TMP_Text txtTimer_red;
     public TMP_Text txtTimer_blue;
     private TMP_Text txtTimer;
-    private int timer = 60;
+    private int timer;
 
     //UI玩家血量
     public TMP_Text HPnum1;
@@ -60,28 +62,81 @@ public class GameThread : MonoBehaviour
         {"Red_SHUAI",1 },{"Red_SHI",2},{"Red_XIANG",2},{"Red_JU",2},{"Red_MA",2},{"Red_PAO",2},{"Red_BING",5}
     };
 
-    // Start is called before the first frame update
-    void Start()
+    private void OnEnable()
     {
+        Debug.Log(Time.time);
+        //初始化，获取需要的组件
+        Init();
+        //加载游戏对象
         GameLoad();
 
-        //获取棋盘管理器
-        boardClass = BoardClass.GetBoard();
+        if (Time.timeScale == 0)
+        {
+            //启动游戏
+            Time.timeScale = 1;
+        }
+
+        //Debug.Log(boardClass);
     }
 
-    // Update is called once per frame
     void Update()
     {
+        Debug.Log("11111111111");
         GameRun();
     }
 
-    public void GameLoad()
+    //初始化，获取需要用到的组件
+    public void Init()
     {
+        //获取棋盘管理器
+        boardClass = BoardClass.GetBoard();
+        //初始化棋盘管理器
+        //（第一次结束后，因为棋盘管理器是静态的，所以他本身的内存还在，但是他内部动态分配的东西全都被清除了）
+         boardClass.Init();
+
+        //获取玩家对象
+        player = PlayerClass.GetPlayer();
+        enemy = PlayerClass.GetEnemy();
+
+        //获取加载器
+        chessLoader = ChessLoader.GetChessLoader();
+
         //获取音乐播放组件和音乐资源文件
         audioSource = GetComponent<AudioSource>();
         musicClass = GetComponent<MusicClass>();
 
+        //设置计时器初始时为回合时间
+        timer = (int)boundTime;
+        
+        //获取进入下棋界面的时间，进入下棋界面时第一个回合开始计时
+        boundStartTime = Time.time;
+
+        //刚开始时没有棋子被选择，标记无选中棋子
+        selectedChess = null;
+
+        //播放开始游戏音效
+        audioSource.PlayOneShot(musicClass.startGame);
+    }
+
+    public void GameLoad()
+    {
+
+        //加载棋子
+        chessLoader.LoadChess();
+
+        //加载棋子列表
+        chessLoader.LoadRecord();
+
+        //加载玩家
+        chessLoader.LoadPlayer();
+
         //随机决定先行方
+        GetRandomPlayer();
+    }
+
+    //随机决定先行方
+    private void GetRandomPlayer()
+    {
         System.Random random = new System.Random((int)System.DateTime.Now.Ticks);
         int n = random.Next(100);
 
@@ -125,7 +180,7 @@ public class GameThread : MonoBehaviour
         }
 
         //判定是否结束游戏
-        EndGame();
+        GameOver();
 
         
     }
@@ -133,7 +188,7 @@ public class GameThread : MonoBehaviour
     //判定是否超时，超时则直接判定输了（true为超时，false为没有超时）
     private bool IsOutOfBound()
     {
-        timer = (int)(60 - Time.time + boundStartTime);
+        timer = (int)(boundTime - Time.time + boundStartTime);
         txtTimer.text = Convert.ToString(timer);
         //如果游戏当前的时间距离本回合开始的时间超过一个回合的时间则自动判定这一方输了
         if (timer <= 0)
@@ -155,7 +210,7 @@ public class GameThread : MonoBehaviour
     }
 
     //判定游戏是否分出胜负
-    private void EndGame()
+    private void GameOver()
     {
         //如果有一方血量小于或等于0，则游戏结束，并显示输赢
         if(player.Hp <= 0)
@@ -166,8 +221,13 @@ public class GameThread : MonoBehaviour
             //暂停游戏
             Time.timeScale = 0;
 
-            GameObject.Find("GameData").GetComponent<GameData>().param = 12313213;
-            SceneManager.LoadScene(8);
+            boardClass = null;
+            
+
+            //加载失败场景
+            GameObject.Find("GameData").GetComponent<GameData>().param = 2;
+            SceneManager.LoadScene(5);
+            //Destroy(gameObject);
         }
         else if(enemy.Hp <= 0)
         {
@@ -177,8 +237,9 @@ public class GameThread : MonoBehaviour
             //暂停游戏
             Time.timeScale = 0;
 
-            GameObject.Find("GameData").GetComponent<GameData>().param = 12313213;
-            SceneManager.LoadScene(7);
+            //加载胜利场景
+            GameObject.Find("GameData").GetComponent<GameData>().param = 1;
+            SceneManager.LoadScene(5);
         }
     }
 
@@ -345,10 +406,10 @@ public class GameThread : MonoBehaviour
 
                         //如果可以移动，切换回合
                         BoundChange();
-                        
+                        Recordchange(chessObject);
                     }
 
-                    Recordchange(chessObject);
+                    
                 }
             }
             //选中的已翻起的棋子为炮时，点击的棋子不是已翻起的当前方的棋子，都执行吃棋
@@ -370,9 +431,9 @@ public class GameThread : MonoBehaviour
 
                         //如果可以移动，切换回合
                         BoundChange();
-                        
+                        Recordchange(chessObject);
                     }
-                    Recordchange(chessObject);
+                    
                 }
             }
         }

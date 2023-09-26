@@ -128,12 +128,13 @@ public class BoardClass
     }
 
     //不允许其他人创建，内存中只能有一个
-    private BoardClass()
-    {
-        Init();
-    }
+    private BoardClass(){}
 
-    private void Init()
+    //初始化方法
+    //由于使用双例类，必须使用静态变量，
+    //第二次重新进入当前场景时，本类的内存不会清除，但类里面的变量会，所以要重新初始化一下
+    //所以构造函数和初始化函数分开调用，每次进入下棋场景都初始化一下本类
+    public void Init()
     {
         boardManager = new GameObject[4, 8];
         chessManager = new GameObject[4, 8];
@@ -149,8 +150,10 @@ public class BoardClass
         chessHP.Add(ChessType.PAO , 5);
         chessHP.Add(ChessType.BING, 2);
 
+        Debug.Log(boardClass);
         //初始化棋盘格子列表
         GameObject[] boardElement = GameObject.FindGameObjectsWithTag("BoardElement");
+        
 
         if(boardElement != null)
         {
@@ -163,49 +166,5 @@ public class BoardClass
                 }
             }
         }
-
-    
-        //TODO:随机加载棋盘棋子
-        //初始化一个32位数大小的List，对应32个棋子，取出不重复的随机数
-
-        List<string> chessName = new List<string>() {
-            "Red.Shuai.1" ,"Red.Shi.1","Red.Shi.2","Red.Xiang.1","Red.Xiang.2","Red.Ju.1",
-           "Red.Ju.2","Red.Ma.1","Red.Ma.2","Red.Pao.1","Red.Pao.2","Red.Bing.1","Red.Bing.2",
-           "Red.Bing.3","Red.Bing.4","Red.Bing.5",
-           "Black.Shuai.1" ,"Black.Shi.1","Black.Shi.2","Black.Xiang.1","Black.Xiang.2","Black.Ju.1",
-           "Black.Ju.2","Black.Ma.1","Black.Ma.2","Black.Pao.1","Black.Pao.2","Black.Bing.1","Black.Bing.2",
-           "Black.Bing.3","Black.Bing.4","Black.Bing.5"
-        };
-    
-        Random random = new System.Random((int)System.DateTime.Now.Ticks);
-
-        //获取预制件
-        GameObject chessPrefab = Resources.Load("Prefab/Chess") as GameObject;
-
-       
-        //实例化棋子
-        for (int i = 0; i < 4; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                int index = random.Next(0, chessName.Count);
-                //Debug.Log("i:"+i +"j:"+ j + "index:" + index);
-
-
-                GameObject chess = GameObject.Instantiate(chessPrefab, boardManager[i, j].transform.position, Quaternion.identity);
-                chess.transform.GetChild(0).transform.GetChild(0).name = chessName[index];
-
-                //启动脚本，并根据名字进行自动配置棋子
-                chess.transform.GetChild(0).transform.GetChild(0).GetComponent<ChessClass>().enabled = true;
-
-                chessManager[i, j] = chess.transform.Find("Chess/"+chessName[index]).gameObject;
-                chessName.RemoveAt(index);
-            }
-        }
-
-        //初始化棋盘棋子列表
-        GameObject[] redChess = GameObject.FindGameObjectsWithTag("RedChess");
-        GameObject[] blackChess = GameObject.FindGameObjectsWithTag("BlackChess");
-
     }
 }

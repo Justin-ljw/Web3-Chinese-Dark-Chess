@@ -9,4 +9,5 @@ public class MusicClass : MonoBehaviour
     public AudioClip upShuai;
     public AudioClip eatChess;
     public AudioClip eatShuai;
+    public AudioClip startGame;
 }

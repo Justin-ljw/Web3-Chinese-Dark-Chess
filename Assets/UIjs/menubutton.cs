@@ -25,6 +25,6 @@ public class menubutton : MonoBehaviour
     public void playClick()
     {
 
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(4);
     }
 }

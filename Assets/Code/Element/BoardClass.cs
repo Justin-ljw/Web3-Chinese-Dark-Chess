@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = System.Random;
 
 //单例模式：内存中只有一个管理器（要让其他人都能拿到同一个管理器）
 public class BoardClass
@@ -88,24 +86,6 @@ public class BoardClass
         DeadChessManager.Add(deadChess);
     }
 
-    //移除棋子：棋子被吃时把棋子从棋子管理器移除，并放入到死亡管理器中
-    /*public void RemoveChess(GameObject deadChess)
-    {
-        for (int i = 0; i < ChessManager.GetLength(0); i++)
-        {
-            for (int j = 0; j < ChessManager.GetLength(1); j++)
-            {
-                if(ChessManager[i , j] == deadChess)
-                {
-                    //把被吃掉的棋子放入死亡管理器
-                    deadChessManager.Add(deadChess);
-                    //把被吃掉的棋子从棋子管理器移除
-                    chessManager[i, j] = null;
-                }
-            }
-        }
-    }*/
-
     //单例本类：内存中只有唯一一个
     private static BoardClass boardClass = null;
     //线程锁对象：用于给线程上锁
@@ -150,20 +130,12 @@ public class BoardClass
         chessHP.Add(ChessType.PAO , 5);
         chessHP.Add(ChessType.BING, 2);
 
-        Debug.Log(boardClass);
-        //初始化棋盘格子列表
-        GameObject[] boardElement = GameObject.FindGameObjectsWithTag("BoardElement");
-        
-
-        if(boardElement != null)
+        for (int i = 0; i < BoardManager.GetLength(0); i++)
         {
-            for (int i = 0, k = 0; i < BoardManager.GetLength(0); i++)
+            for (int j = 0; j < BoardManager.GetLength(1); j++)
             {
-                for (int j = 0; j < BoardManager.GetLength(1); j++)
-                {
-                    BoardManager[i, j] = boardElement[k];
-                    k++;
-                }
+                //按照名字找到对应的棋盘格子，并绑定到棋盘管理器对应的位置上
+                BoardManager[i, j] = GameObject.Find("Board(" + i + "," + j + ")");
             }
         }
     }

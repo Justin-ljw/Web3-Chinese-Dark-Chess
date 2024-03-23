@@ -19,7 +19,7 @@ public class rulebutton : MonoBehaviour
     }
     public void ruleClick()
     {
-        SceneManager.LoadScene(4);
+        SceneManager.LoadScene(2);
     }
 
    

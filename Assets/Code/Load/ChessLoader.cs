@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -27,7 +26,6 @@ public class ChessLoader
 
     public void LoadChess()
     {
-        Debug.Log("6666666666666");
         //获取棋盘管理器
         BoardClass boardClass = BoardClass.GetBoard();
 
@@ -55,12 +53,8 @@ public class ChessLoader
             for (int j = 0; j < 8; j++)
             {
                 int index = random.Next(0, chessName.Count);
-                //Debug.Log("i:"+i +"j:"+ j + "index:" + index);
-
 
                 GameObject chess = GameObject.Instantiate(chessPrefab, boardClass.BoardManager[i, j].transform.position, Quaternion.identity);
-
-                Debug.Log(chess);
 
                 chess.transform.GetChild(0).transform.GetChild(0).name = chessName[index];
 

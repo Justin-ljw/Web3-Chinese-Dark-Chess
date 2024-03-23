@@ -46,7 +46,7 @@ public class winback : MonoBehaviour
     }
     public void playClick()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(4);
     }
 
 }

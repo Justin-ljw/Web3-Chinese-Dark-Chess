@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -64,7 +63,6 @@ public class GameThread : MonoBehaviour
 
     private void OnEnable()
     {
-        Debug.Log(Time.time);
         //初始化，获取需要的组件
         Init();
         //加载游戏对象
@@ -75,13 +73,10 @@ public class GameThread : MonoBehaviour
             //启动游戏
             Time.timeScale = 1;
         }
-
-        //Debug.Log(boardClass);
     }
 
     void Update()
     {
-        Debug.Log("11111111111");
         GameRun();
     }
 
@@ -215,9 +210,6 @@ public class GameThread : MonoBehaviour
         //如果有一方血量小于或等于0，则游戏结束，并显示输赢
         if(player.Hp <= 0)
         {
-            ///显示输赢
-            Debug.Log("enemy Win");
-
             //暂停游戏
             Time.timeScale = 0;
 
@@ -231,9 +223,6 @@ public class GameThread : MonoBehaviour
         }
         else if(enemy.Hp <= 0)
         {
-            ///显示输赢
-            Debug.Log("player Win");
-
             //暂停游戏
             Time.timeScale = 0;
 
@@ -252,7 +241,6 @@ public class GameThread : MonoBehaviour
         txtTimer.enabled = false;
         //当前的回合方切换颜色
         bound = !bound;
-        //Debug.Log("当前为："+bound);
         //当前的时间设置为新回合的开始时间
         boundStartTime = Time.time;
 
@@ -267,7 +255,6 @@ public class GameThread : MonoBehaviour
             txtTimer = txtTimer_blue;
             left_fire.enabled = true;
         }
-        Debug.Log(txtTimer);
         txtTimer.enabled = true;
     }
 
